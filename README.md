@@ -1,1 +1,1 @@
-# news-backend
+# newspole-backend

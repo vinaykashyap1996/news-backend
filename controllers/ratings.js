@@ -12,7 +12,9 @@ exports.postratings = (req, res) => {
           userId: req.body.userId,
           newsId: req.body.newsId,
           belivibalityIndex: req.body.bi,
-          priorknowledge: req.body.pk
+          priorknowledge: req.body.pk,
+          readingTime: req.body.readingTime,
+          flag: req.body.flag
         });
         ratingsData.save((err, result) => {
           if (err) {

@@ -7,9 +7,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const async = require("async");
 const port = process.env.PORT || 3002;
+const results = [];
 const csv = require("csv-parser");
 const fs = require("fs");
-// const csvPath = require("./config/joined_tables.csv");
 const NewsModel = require("./model/News").newsModel;
 
 const passport = require("passport");
@@ -40,14 +40,22 @@ app.use("/news", news);
 const rating = require("./routes/ratings");
 app.use("/rating", rating);
 
-const results = [];
-fs.createReadStream("./config/joined_tables.csv")
-  .pipe(csv())
-  .on("data", data => results.push(data))
-  .on("end", () => {
-    // console.log(results);
-    NewsModel.insertMany(results);
-  });
+app.get("/postnews", (req, res) => {
+  fs.createReadStream("./config/joined_tables.csv")
+    .pipe(csv())
+    .on("data", data => results.push(data))
+    .on("end", () => {
+      for (i = 0; i < results.length; i++) {
+        if (
+          results[i]["body"] != " " &&
+          results[i]["lang"] != "lang_err" &&
+          results[i]["publish_date"] != ""
+        ) {
+          NewsModel.insertMany(results[i]);
+        }
+      }
+    });
+});
 
 app.listen(port, () => {
   console.log("server running on port number 3002");

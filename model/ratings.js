@@ -5,8 +5,8 @@ const ratingSchema = mongoose.Schema({
   newsId: String,
   belivibalityIndex: Number,
   priorknowledge: Number,
-  readingTime: Number,
-  Flag: Boolean
+  readingTime: String,
+  flag: Boolean
 });
 
 const ratings = mongoose.model("ratings", ratingSchema);

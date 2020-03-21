@@ -6,7 +6,7 @@ const ratingSchema = mongoose.Schema({
   belivibalityIndex: Number,
   priorknowledge: Number,
   readingTime: String,
-  flag: Boolean
+  flag: { type: Boolean, default: false }
 });
 
 const ratings = mongoose.model("ratings", ratingSchema);

@@ -13,6 +13,10 @@ router.get("/getnews", (req, res) => {
   NewsController.getnews(req, res);
 });
 
+router.get("/sessiondata", (req, res) => {
+  NewsController.getnews1(req, res);
+});
+
 router.get("/postnews", (req, res) => {
   NewsController.postNewsFile(req, res);
 });

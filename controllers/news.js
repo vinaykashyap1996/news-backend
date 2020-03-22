@@ -157,7 +157,7 @@ exports.getSessionData = (req, res) => {
       if (err) {
         return res.json({ message: err });
       }
-      res.json({ message: "results", newsIds: Ids, sessionData: resultsid });
+      res.json({ message: "results", newsIds: resultsid, sessionData: Ids });
     }
   );
 };

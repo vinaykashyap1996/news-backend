@@ -59,30 +59,32 @@ exports.getnews = (req, res) => {
           waterfallCb(null, results);
         });
       },
-      function(Ids, waterfallCb) {
-        async.eachLimit(Ids, 1, function(singleEmp, eachCallback) {
+      function(Ids, waterfallCb2) {
+        async.eachLimit(Ids, 2, function(singleEmp, eachCallback) {
           async.waterfall(
             [
-              ratingsModel.find(
-                {
-                  $and: [
-                    { newsId: singleEmp._id },
-                    { userId: req.query.userId }
-                  ]
-                },
-                (err, resultsid) => {
-                  if (err) {
-                    return waterfallCb("Error in saving to the DB");
+              function(innerWaterfallCb) {
+                ratingsModel.find(
+                  {
+                    $and: [
+                      { newsId: singleEmp._id },
+                      { userId: req.query.userId }
+                    ]
+                  },
+                  (err, resultsid) => {
+                    if (err) {
+                      return innerWaterfallCb("Error in saving to the DB");
+                    }
+                    innerWaterfallCb(null, resultsid);
                   }
-                  waterfallCb(null, resultsid, Ids);
-                }
-              )
+                );
+              }
             ],
             function(err, resultsid) {
               if (err) {
-                return eachCallback(err);
+                return waterfallCb2(err);
               }
-              eachCallback(null);
+              waterfallCb2(null, Ids, resultsid);
             }
           );
         });
@@ -90,9 +92,9 @@ exports.getnews = (req, res) => {
     ],
     function(err, resultsid, Ids) {
       if (err) {
-        return waterfallCb(err);
+        return res.json({ message: err });
       }
-      res.json({ message: "results", newsData: Ids, userData: resultsid });
+      res.json({ message: "results", newsData: resultsid, userData: Ids });
     }
   );
 };
@@ -133,10 +135,8 @@ exports.getnews1 = (req, res) => {
     ],
     function(err, resultsid, Ids) {
       if (err) {
-        return waterfallCb(err);
+        return res.json({ message: err });
       }
-      console.log(typeof resultsid);
-
       res.json({ message: "results", newsIds: Ids, sessionData: resultsid });
     }
   );

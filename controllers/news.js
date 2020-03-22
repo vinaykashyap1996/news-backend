@@ -49,14 +49,52 @@ exports.postnews = (req, res) => {
 };
 
 exports.getnews = (req, res) => {
-  NewsModel.find({ _id: req.query.newsId }, (err, results) => {
-    if (err) {
-      return res
-        .status(404)
-        .json({ message: "Error in displaying the content", err });
+  async.waterfall(
+    [
+      function(waterfallCb) {
+        NewsModel.find({ _id: req.query.newsId }, (err, results) => {
+          if (err) {
+            return waterfallCb("Error in saving to the DB");
+          }
+          waterfallCb(null, results);
+        });
+      },
+      function(Ids, waterfallCb) {
+        async.eachLimit(Ids, 1, function(singleEmp, eachCallback) {
+          async.waterfall(
+            [
+              ratingsModel.find(
+                {
+                  $and: [
+                    { newsId: singleEmp._id },
+                    { userId: req.query.userId }
+                  ]
+                },
+                (err, resultsid) => {
+                  if (err) {
+                    return waterfallCb("Error in saving to the DB");
+                  }
+                  waterfallCb(null, resultsid, Ids);
+                }
+              )
+            ],
+            function(err, resultsid) {
+              if (err) {
+                return eachCallback(err);
+              }
+              eachCallback(null);
+            }
+          );
+        });
+      }
+    ],
+    function(err, resultsid, Ids) {
+      if (err) {
+        return waterfallCb(err);
+      }
+      res.json({ message: "results", newsData: Ids, userData: resultsid });
     }
-    res.status(200).json({ message: "successfully fetched the data", results });
-  });
+  );
 };
 
 exports.getnews1 = (req, res) => {
@@ -72,7 +110,6 @@ exports.getnews1 = (req, res) => {
       },
       function(Ids, waterfallCb) {
         async.eachLimit(Ids, 2, function(singleEmp, eachCallback) {
-          // console.log(singleEmp);
           async.waterfall(
             [
               ratingsModel
@@ -80,8 +117,6 @@ exports.getnews1 = (req, res) => {
                   if (err) {
                     return waterfallCb("Error in saving to the DB");
                   }
-                  // console.log(resultsid);
-
                   waterfallCb(null, resultsid, Ids);
                 })
                 .select("newsId flag -_id")

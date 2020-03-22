@@ -115,28 +115,40 @@ exports.getSessionData = (req, res) => {
           Ids,
           2,
           function(singleEmp, eachCallback) {
-            ratingsModel
-              .find(
-                {
-                  $and: [
-                    { newsId: singleEmp._id },
-                    { userId: req.query.userId }
-                  ]
-                },
-                (err, resultsid) => {
-                  if (err) {
-                    return eachCallback("Error in saving to the DB");
-                  }
-                  eachCallback(resultsid, null);
+            async.waterfall(
+              [
+                function(innerWaterfallCb) {
+                  ratingsModel
+                    .find(
+                      {
+                        $or: [
+                          { newsId: singleEmp._id },
+                          { userId: req.query.userId }
+                        ]
+                      },
+                      (err, resultsid) => {
+                        if (err) {
+                          return innerWaterfallCb("Error in saving to the DB");
+                        }
+                        innerWaterfallCb(null, resultsid, Ids);
+                      }
+                    )
+                    .select("newsId flag -_id");
                 }
-              )
-              .select("newsId flag -_id");
+              ],
+              function(err, resultsid) {
+                if (err) {
+                  return eachCallback(err);
+                }
+                eachCallback(resultsid, null);
+              }
+            );
           },
-          function(resultid, err) {
+          function(resultsid, err) {
             if (err) {
               return waterfallCb(err);
             }
-            waterfallCb(null, Ids, resultid);
+            waterfallCb(null, Ids, resultsid);
           }
         );
       }
@@ -145,7 +157,7 @@ exports.getSessionData = (req, res) => {
       if (err) {
         return res.json({ message: err });
       }
-      res.json({ message: "results", newsIds: resultsid, sessionData: Ids });
+      res.json({ message: "results", newsIds: Ids, sessionData: resultsid });
     }
   );
 };

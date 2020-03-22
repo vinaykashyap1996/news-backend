@@ -99,7 +99,7 @@ exports.getnews = (req, res) => {
   );
 };
 
-exports.getnews1 = (req, res) => {
+exports.getSessionData = (req, res) => {
   async.waterfall(
     [
       function(waterfallCb) {
@@ -111,33 +111,41 @@ exports.getnews1 = (req, res) => {
         }).select("_id");
       },
       function(Ids, waterfallCb) {
-        async.eachLimit(Ids, 2, function(singleEmp, eachCallback) {
-          async.waterfall(
-            [
-              ratingsModel
-                .find({ newsId: singleEmp._id }, (err, resultsid) => {
+        async.eachLimit(
+          Ids,
+          2,
+          function(singleEmp, eachCallback) {
+            ratingsModel
+              .find(
+                {
+                  $and: [
+                    { newsId: singleEmp._id },
+                    { userId: req.query.userId }
+                  ]
+                },
+                (err, resultsid) => {
                   if (err) {
-                    return waterfallCb("Error in saving to the DB");
+                    return eachCallback("Error in saving to the DB");
                   }
-                  waterfallCb(null, resultsid, Ids);
-                })
-                .select("newsId flag -_id")
-            ],
-            function(err, resultsid) {
-              if (err) {
-                return eachCallback(err);
-              }
-              eachCallback(null);
+                  eachCallback(resultsid, null);
+                }
+              )
+              .select("newsId flag -_id");
+          },
+          function(resultid, err) {
+            if (err) {
+              return waterfallCb(err);
             }
-          );
-        });
+            waterfallCb(null, Ids, resultid);
+          }
+        );
       }
     ],
     function(err, resultsid, Ids) {
       if (err) {
         return res.json({ message: err });
       }
-      res.json({ message: "results", newsIds: Ids, sessionData: resultsid });
+      res.json({ message: "results", newsIds: resultsid, sessionData: Ids });
     }
   );
 };

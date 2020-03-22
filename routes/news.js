@@ -14,7 +14,7 @@ router.get("/getnews", (req, res) => {
 });
 
 router.get("/sessiondata", (req, res) => {
-  NewsController.getnews1(req, res);
+  NewsController.getSessionData(req, res);
 });
 
 router.get("/postnews", (req, res) => {

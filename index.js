@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const async = require("async");
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3003;
 const results = [];
 const csv = require("csv-parser");
 const fs = require("fs");
@@ -51,12 +51,19 @@ app.get("/postnews", (req, res) => {
           results[i]["lang"] != "lang_err" &&
           results[i]["publish_date"] != ""
         ) {
-          NewsModel.insertMany(results[i]);
+          NewsModel.create(results[i]);
         }
       }
     });
 });
-
+app.delete("/delete", (req, res) => {
+  NewsModel.deleteMany({ id: { $gt: 1000 } }, (err, result) => {
+    if (err) {
+      res.send(err);
+    }
+    res.send("success");
+  });
+});
 app.listen(port, () => {
   console.log("server running on port number 3002");
 });

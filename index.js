@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const Router = app.router();
+const Router = express.Router();
 module.exports = app;
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");

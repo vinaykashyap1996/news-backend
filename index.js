@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const Router = express.Router();
 module.exports = app;
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -28,13 +27,6 @@ global.mongoose = mongoose;
 global.async = async;
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.get("*", function(req, res) {
-  Router.run(routes, req.path, function(Handler, state) {
-    var element = React.createElement(Handler);
-    var html = React.renderToString(element);
-    res.render("main", { content: html });
-  });
-});
 
 app.get("/", (req, res) => {
   res.send("NodeJS");

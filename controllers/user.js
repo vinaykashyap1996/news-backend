@@ -11,17 +11,23 @@ const async = require("async");
 exports.adduser = (req, res, next) => {
   if (!req.body.firstName) {
     return res
-      .status(400)
-      .json({ message: " please pass a proper first name" });
+      .status(200)
+      .json({ status: 400, message: " please pass a proper first name" });
   }
   if (!req.body.lastName) {
-    return res.status(400).json({ message: "please pass a proper last name" });
+    return res
+      .status(200)
+      .json({ status: 400, message: "please pass a proper last name" });
   }
   if (!req.body.email) {
-    return res.status(400).json({ message: "please pass a proper email" });
+    return res
+      .status(200)
+      .json({ status: 400, message: "please pass a proper email" });
   }
   if (!req.body.password) {
-    return res.status(400).json({ message: "please pass a proper password" });
+    return res
+      .status(200)
+      .json({ status: 400, message: "please pass a proper password" });
   }
 
   if (req.body) {
@@ -33,15 +39,20 @@ exports.adduser = (req, res, next) => {
     });
     userData.save((err, result) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ message: "Error saving to the db" + err });
+        return res.status(200).json({
+          status: 404,
+          message: "This Email Id is Already Present"
+        });
       } else {
-        res.status(200).json({ message: "Successfully registerd" });
+        res
+          .status(200)
+          .json({ status: 200, message: "Successfully Registered", result });
       }
     });
   } else {
-    res.status(400).json({ message: "please enter Data" });
+    res
+      .status(200)
+      .json({ status: 400, message: "Please Fill the Information" });
   }
 };
 
@@ -50,17 +61,21 @@ require("dotenv").config();
 
 exports.login = (req, res) => {
   if (!req.body.email) {
-    return res.status(400).json({ message: "please pass a proper Email id" });
+    return res
+      .status(200)
+      .json({ status: 400, message: "please pass a proper Email id" });
   }
   if (!req.body.password) {
-    return res.status(400).json({ message: "please pass a proper password" });
+    return res
+      .status(200)
+      .json({ status: 400, message: "please pass a proper password" });
   }
   userModel.findOne({ email: req.body.email.toLowerCase() }, function(
     err,
     userData
   ) {
     if (err || userData === {} || userData === null) {
-      res.status(404).json({ message: "User Not Found" });
+      res.status(200).json({ status: 404, message: "User Not Found" });
     } else if (bcrypt.compareSync(req.body.password, userData.password)) {
       const payload = { _id: userData._id };
       let token = jwt.sign(payload, process.env.SECRET);
@@ -72,7 +87,7 @@ exports.login = (req, res) => {
         userData
       });
     } else {
-      res.status(404).json({ message: "User Not Found" });
+      res.status(200).json({ status: 404, message: "User Not Found" });
     }
   });
 };
@@ -90,7 +105,7 @@ exports.forgot_password = function(req, res, next) {
         if (err) {
           next(err);
         } else if (!user) {
-          res.status(400).json({ message: "cannot find user" });
+          res.status(200).json({ status: 404, message: "cannot find user" });
         } else {
           user.resetPasswordToken = token;
           user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
@@ -124,17 +139,17 @@ exports.forgot_password = function(req, res, next) {
           ",\n\n" +
           "We recieved a request to reset your News password\n\n" +
           "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-          "http://" +
-          "localhost:3000/reset/" +
+          "https://news-ui-app.herokuapp.com/reset/" +
           token +
           "\n\n" +
           "If you did not request this, please ignore this email and your password will remain unchanged.\n"
       };
       smtpTransport.sendMail(mailOptions, function(err, result) {
         if (err) {
-          res.status(404).json({ err });
+          res.status(200).json({ status: 404, message: err });
         } else {
           res.status(200).json({
+            status: 200,
             message: "we have sent you a link to your registered email id "
           });
         }
@@ -178,8 +193,8 @@ exports.reset_password = (req, res) => {
               function(err, user1) {
                 if (err) {
                   return res
-                    .status(403)
-                    .json({ message: "Not able to find user" });
+                    .status(200)
+                    .json({ status: 403, message: "Not able to find user" });
                 }
                 user1.resetPasswordToken = undefined;
                 user1.resetPasswordExpires = undefined;
@@ -227,11 +242,93 @@ exports.reset_password = (req, res) => {
       };
       smtpTransport.sendMail(mailOptions, function(err, result) {
         if (err) {
-          res.status(500).json({ message: "Error in sending email", err });
+          res
+            .status(200)
+            .json({ status: 500, message: "Error in sending email", err });
         } else {
-          res.status(200).json({ message: "Success" });
+          res.status(200).json({
+            status: 200,
+            message: "Successfully Updated your password"
+          });
         }
       });
     }
   ]);
+};
+
+exports.change_password = (req, res) => {
+  if (!req.body.oldPassword) {
+    return res
+      .status(200)
+      .json({ status: 400, message: "Please Provide You're Old Password" });
+  }
+  if (!req.body.newPassword) {
+    return res
+      .status(200)
+      .json({ status: 400, message: "Please Provide You're New Password" });
+  }
+  async.waterfall(
+    [
+      function(waterfallCb) {
+        userModel.findOne({ _id: req.body.userId }, (err, result) => {
+          if (err) {
+            return waterfallCb("User Not Found");
+          }
+          waterfallCb(null, result);
+        });
+      },
+      function(result, waterfallCb2) {
+        if (!bcrypt.compareSync(req.body.oldPassword, result.password)) {
+          return waterfallCb2("old password not matching");
+        }
+        userModel.findOneAndUpdate(
+          { email: result.email },
+          { password: bcrypt.hashSync(req.body.newPassword, saltRounds) },
+          (err, result) => {
+            if (err) {
+              return waterfallCb2(" Error in updating");
+            }
+            waterfallCb2(null);
+          }
+        );
+      }
+    ],
+    function(err) {
+      if (err) {
+        return res.status(200).json({ status: 400, message: err });
+      }
+      res
+        .status(200)
+        .json({ status: 200, message: "successfully updated your password" });
+    }
+  );
+};
+exports.userCategoryUpdate = (req, res) => {
+  userModel.findOneAndUpdate(
+    { _id: req.body.userId },
+    { category: req.body.category, language: req.body.language },
+    (err, results) => {
+      if (err) {
+        return res
+          .status(200)
+          .json({ status: 400, message: "Error in updating" });
+      }
+      res.status(200).json({ status: 200, message: "Successfully updated" });
+    }
+  );
+};
+
+exports.userLanguageUpdate = (req, res) => {
+  userModel.findOneAndUpdate(
+    { _id: req.body.userId },
+    { language: req.body.language },
+    (err, results) => {
+      if (err) {
+        return res
+          .status(200)
+          .json({ status: 400, message: "Error in updating" });
+      }
+      res.status(200).json({ status: 200, message: "Successfully updated" });
+    }
+  );
 };

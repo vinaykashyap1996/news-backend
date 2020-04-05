@@ -20,3 +20,11 @@ router.get("/sessiondata", (req, res) => {
 router.get("/postnews", (req, res) => {
   NewsController.postNewsFile(req, res);
 });
+
+router.get("/update", (req, res) => {
+  NewsController.update(req, res);
+});
+
+router.get("/social", (req, res) => {
+  NewsController.category(req, res);
+});

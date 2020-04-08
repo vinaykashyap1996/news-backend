@@ -31,3 +31,7 @@ router.post("/categoryupdate", (req, res) => {
 router.post("/languageupdate", (req, res) => {
   userController.userLanguageUpdate(req, res);
 });
+
+router.get("/userdetails", (req, res) => {
+  userController.userDetails(req, res);
+});

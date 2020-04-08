@@ -306,7 +306,7 @@ exports.change_password = (req, res) => {
 exports.userCategoryUpdate = (req, res) => {
   userModel.findOneAndUpdate(
     { _id: req.body.userId },
-    { category: req.body.category, language: req.body.language },
+    { category: req.body.category },
     (err, results) => {
       if (err) {
         return res
@@ -331,4 +331,15 @@ exports.userLanguageUpdate = (req, res) => {
       res.status(200).json({ status: 200, message: "Successfully updated" });
     }
   );
+};
+
+exports.userDetails = (req, res) => {
+  userModel
+    .find({ _id: req.query.userId }, (err, results) => {
+      if (err) {
+        return res.status(200).json({ status: 404, message: "User not found" });
+      }
+      res.status(200).json({ status: 200, results });
+    })
+    .select("-password");
 };

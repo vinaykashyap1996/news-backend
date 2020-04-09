@@ -191,22 +191,21 @@ exports.update = (req, res) => {
               [
                 function(innerWaterfallCb) {
                   let newsId = singleNews._id;
-                  let url =
-                    // singleNews.url.replace("watch?v=", "embed/")
-                    singleNews.url
-                      .replace(/\b&fbclid=[0-9a-zA-Z_@.#+-]{1,50}\b/, "")
-                      .replace("time_continue=1&", "")
-                      .replace("watch?v=", "embed/")
-                      .replace(/\b&feature=[0-9a-zA-Z_@.#+-]{1,50}\b/, "")
-                      .replace(/\b&t=[0-9a-zA-Z_@.#+-]s{1,50}\b/, "")
-                      .replace(/\b&t=[0-9a-zA-Z_@.#+-]{1,50}\b/, "")
-                      .replace(/\b&mod=[0-9a-zA-Z_@.#+-]{1,50}\b/, "");
+                  let url = singleNews.url
+                    .replace(/\b&fbclid=[0-9a-zA-Z_@.#+-]{1,50}\b/, "")
+                    .replace("reload=9&", "")
+                    .replace("time_continue=1&", "")
+                    .replace("watch?v=", "embed/")
+                    .replace(/\b&feature=[0-9a-zA-Z_@.#+-]{1,50}\b/, "")
+                    .replace(/\b&t=[0-9a-zA-Z_@.#+-]s{1,50}\b/, "")
+                    .replace(/\b&t=[0-9a-zA-Z_@.#+-]{1,50}\b/, "")
+                    .replace(/\b&mod=[0-9a-zA-Z_@.#+-]{1,50}\b/, "");
                   NewsModel.updateMany(
                     { _id: newsId },
                     { url: url },
                     (err, result) => {
                       if (err) {
-                        innerWaterfallCb("updating error");
+                        return innerWaterfallCb("updating error" + err);
                       }
                       innerWaterfallCb(null);
                     }
@@ -215,7 +214,7 @@ exports.update = (req, res) => {
               ],
               function(err) {
                 if (err) {
-                  eachCallback(err);
+                  return eachCallback(err);
                 }
                 eachCallback(null);
               }
@@ -223,7 +222,7 @@ exports.update = (req, res) => {
           },
           function(err) {
             if (err) {
-              waterfallCb2(err);
+              return waterfallCb2(err);
             }
             waterfallCb2(null);
           }
@@ -232,7 +231,7 @@ exports.update = (req, res) => {
     ],
     function(err) {
       if (err) {
-        res.status(200).json({ status: 403, message: err });
+        return res.status(200).json({ status: 403, message: err });
       }
       res.json({ status: 200, message: "updating successfull" });
     }
@@ -272,7 +271,7 @@ exports.category = (req, res) => {
                     { category: social },
                     (err, result) => {
                       if (err) {
-                        innerWaterfallCb("updating error");
+                        return innerWaterfallCb("updating error");
                       }
                       innerWaterfallCb(null);
                     }
@@ -281,7 +280,7 @@ exports.category = (req, res) => {
               ],
               function(err) {
                 if (err) {
-                  eachCallback(err);
+                  return eachCallback(err);
                 }
                 eachCallback(null);
               }
@@ -289,7 +288,7 @@ exports.category = (req, res) => {
           },
           function(err) {
             if (err) {
-              waterfallCb2(err);
+              return waterfallCb2(err);
             }
             waterfallCb2(null);
           }
@@ -298,7 +297,7 @@ exports.category = (req, res) => {
     ],
     function(err) {
       if (err) {
-        res.status(200).json({ status: 403, message: err });
+        return res.status(200).json({ status: 403, message: err });
       }
       res.json({ status: 200, message: "updating successfull" });
     }

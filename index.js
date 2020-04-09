@@ -93,6 +93,17 @@ app.delete("/delete", (req, res) => {
   });
 });
 
+app.get("/unique", (req, res) => {
+  NewsModel.distinct("url")
+    .count()
+    .exec(function(err, count) {
+      if (err) {
+        return res.json({ err });
+      }
+      res.status(200).json({ count });
+    });
+});
+
 app.listen(port, () => {
   console.log("server running on port number 3002");
 });

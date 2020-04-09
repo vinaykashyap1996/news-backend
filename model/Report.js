@@ -9,5 +9,5 @@ const reportSchema = mongoose.Schema({
 const reports = mongoose.model("reports", reportSchema);
 module.exports = {
   reportsModel: reports,
-  reportsSchema: this.reportsModel
+  reportsSchema: reportSchema
 };

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const newsSchema = mongoose.Schema({
-  id: { type: String, unique: true },
-  url: { type: String, unique: true },
+  id: String,
+  url: { type: String },
   category: String,
   source: String,
-  headline: String,
+  headline: { type: String, unique: true },
   body: String,
   publish_date: String,
   lang: String,
@@ -19,5 +19,5 @@ const newsSchema = mongoose.Schema({
 const news = mongoose.model("news", newsSchema);
 module.exports = {
   newsModel: news,
-  newsSchema: this.newsModel
+  newsSchema: newsSchema
 };

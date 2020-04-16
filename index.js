@@ -62,15 +62,12 @@ app.post("/image", type, (req, res) => {
 });
 app.get("/postnews", async (req, res, next) => {
   try {
-    fs.createReadStream("./config/joined_tables.csv")
+    fs.createReadStream("./config/subset_samples.csv")
       .pipe(csv())
       .on("data", data => results.push(data))
       .on("end", () => {
         for (i = 0; i < results.length; i++) {
-          if (
-            results[i]["body"] != " " &&
-            results[i]["publish_date"] != ""
-          ) {
+          {
             NewsModel.insertMany(results[i], { ordered: false }, function(
               error,
               docs

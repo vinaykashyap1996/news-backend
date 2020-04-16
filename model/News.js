@@ -1,19 +1,14 @@
 const mongoose = require("mongoose");
 
 const newsSchema = mongoose.Schema({
-  id: String,
-  url: { type: String },
+  url: { type: String, unique: true },
+  // collection: String,
   category: String,
   source: String,
-  headline: { type: String, unique: true },
-  body: String,
+  title: { type: String, unique: true },
   publish_date: String,
-  lang: String,
-  factchecker_label: String,
-  normalised_score: String,
-  headline_lang: String,
-  normalised_label: String,
-  image: String
+  lang: { type: String, default: "en" },
+  text: String
 });
 
 const news = mongoose.model("news", newsSchema);

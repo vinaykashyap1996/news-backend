@@ -69,7 +69,6 @@ app.get("/postnews", async (req, res, next) => {
         for (i = 0; i < results.length; i++) {
           if (
             results[i]["body"] != " " &&
-            results[i]["lang"] != "lang_err" &&
             results[i]["publish_date"] != ""
           ) {
             NewsModel.insertMany(results[i], { ordered: false }, function(

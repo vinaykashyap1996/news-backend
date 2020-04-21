@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const newsSchema = mongoose.Schema({
   url: { type: String, unique: true },
-  // collection: String,
+  group: String,
   category: String,
   source: String,
   title: { type: String, unique: true },
-  publish_date: String,
+  publishedDate: String,
   lang: { type: String, default: "en" },
-  text: String
+  content: String
 });
 
 const news = mongoose.model("news", newsSchema);

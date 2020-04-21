@@ -343,3 +343,18 @@ exports.userDetails = (req, res) => {
     })
     .select("-password");
 };
+
+exports.userTaskUpdate = (req, res) => {
+  userModel.findOneAndUpdate(
+    { _id: req.body.userId },
+    { task: req.body.task },
+    (err, results) => {
+      if (err) {
+        return res
+          .status(200)
+          .json({ status: 400, message: "Error in updating" });
+      }
+      res.status(200).json({ status: 200, message: "Successfully updated" });
+    }
+  );
+};

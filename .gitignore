@@ -1,5 +1,6 @@
 node_modules
 /config/joined_tables.csv
 /config/subset_samples.csv
+/config/joined_politics_fakenews.csv
 .env
 uploads

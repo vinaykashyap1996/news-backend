@@ -62,7 +62,7 @@ app.post("/image", type, (req, res) => {
 });
 app.get("/postnews", async (req, res, next) => {
   try {
-    fs.createReadStream("./config/subset_samples.csv")
+    fs.createReadStream("./config/joined_politics_fakenews.csv")
       .pipe(csv())
       .on("data", data => results.push(data))
       .on("end", () => {

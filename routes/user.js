@@ -32,6 +32,9 @@ router.post("/languageupdate", (req, res) => {
   userController.userLanguageUpdate(req, res);
 });
 
+router.post("/taskupdate", (req, res) => {
+  userController.userTaskUpdate(req, res);
+});
 router.get("/userdetails", (req, res) => {
   userController.userDetails(req, res);
 });

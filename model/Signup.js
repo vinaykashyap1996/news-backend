@@ -7,7 +7,8 @@ const userSchema = mongoose.Schema({
   category: { type: String, default: null },
   language: { type: String, default: null },
   resetPasswordToken: { type: String, default: null },
-  resetPasswordExpires: { type: Date, default: null }
+  resetPasswordExpires: { type: Date, default: null },
+  task: String
 });
 
 const users = mongoose.model("users", userSchema);

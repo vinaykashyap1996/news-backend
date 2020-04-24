@@ -80,8 +80,9 @@ app.get("/postnews", async (req, res, next) => {
   }
 });
 
-app.delete("/delete", (req, res) => {
-  NewsModel.deleteMany({ id: { $gt: 1000 } }, (err, result) => {
+app.get("/delete", (req, res) => {
+  let pattern = /fake-[a-z]/;
+  NewsModel.deleteMany({ group: pattern }, (err, result) => {
     if (err) {
       res.send(err);
     }
@@ -89,15 +90,85 @@ app.delete("/delete", (req, res) => {
   });
 });
 
-app.get("/unique", (req, res) => {
-  NewsModel.distinct("url")
-    .count()
-    .exec(function(err, count) {
-      if (err) {
-        return res.json({ err });
+app.get("/datajson", (req, res) => {
+  let pattern = /fake-[a-z]/;
+  async.waterfall(
+    [
+      function(waterfallCb1) {
+        NewsModel.find({ group: "satire" }).exec((err, result) => {
+          if (err) {
+            return waterfallCb1(err);
+          }
+          waterfallCb1(null, result);
+        });
+      },
+      function(Ids, waterfallCb) {
+        async.eachLimit(
+          Ids,
+          100,
+          function(singleSource, eachCallback) {
+            async.waterfall(
+              [
+                function(innerWaterfallCb) {
+                  NewsModel.find(
+                    {
+                      $or: [{ source: singleSource }, { group: "satire" }]
+                    },
+                    (err, results) => {
+                      if (err) {
+                        return innerWaterfallCb("Error in saving to the DB");
+                      }
+                      innerWaterfallCb(null, results);
+                    }
+                  ).select("-_id");
+                }
+              ],
+              function(err, resultsid) {
+                if (err) {
+                  return eachCallback(err);
+                }
+                eachCallback(resultsid, null);
+              }
+            );
+          },
+          function(resultsid, err) {
+            if (err) {
+              return waterfallCb(err);
+            }
+            waterfallCb(null, resultsid);
+          }
+        );
       }
-      res.status(200).json({ count });
-    });
+    ],
+    function(err, Ids) {
+      if (err) {
+        return res.json({ message: err });
+      }
+
+      const resultArrayfinal = [];
+      const map = new Map();
+      for (const item of Ids) {
+        if (!map.has(item.source)) {
+          map.set(item.source, true); // set any value to Map
+          resultArrayfinal.push({
+            lang: item.lang,
+            title: item.title,
+            publishedDate: item.publishedDate,
+            url: item.url,
+            source: item.source,
+            category: item.category,
+            content: item.content,
+            collection: item.group
+          });
+        }
+      }
+      let xyz = resultArrayfinal.slice(0, 25);
+      let data = JSON.stringify(xyz);
+      fs.writeFileSync("satire_politics", data);
+
+      res.json({ message: "success" });
+    }
+  );
 });
 
 app.listen(port, () => {

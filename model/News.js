@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const newsSchema = mongoose.Schema({
   url: { type: String, unique: true },
-  group: String,
+  group: { type: String, default: "satire" },
   category: String,
   source: String,
   title: { type: String, unique: true },

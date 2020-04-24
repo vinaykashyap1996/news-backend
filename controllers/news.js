@@ -55,7 +55,7 @@ exports.getnews = (req, res) => {
             return waterfallCb("Error in saving to the DB");
           }
           waterfallCb(null, results);
-        });
+        }).sort({ source: -1 });
       },
       function(Ids, waterfallCb2) {
         async.eachLimit(Ids, 2, function(singleEmp, eachCallback) {
@@ -125,7 +125,9 @@ exports.getSessionData = (req, res) => {
             return waterfallCb("Error in saving to the DB");
           }
           waterfallCb(null, results);
-        }).select("_id");
+        })
+          .select("_id")
+          .sort({ source: -1 });
       },
       function(Ids, waterfallCb) {
         async.eachLimit(

@@ -2,5 +2,12 @@ node_modules
 /config/joined_tables.csv
 /config/subset_samples.csv
 /config/joined_politics_fakenews.csv
+/config/plausible_politics.csv
+/config/nottheonion_politics.csv
+/config/satire_politics.csv
 .env
 uploads
+satire_politics
+true_plausible
+nottheonion
+fake-news

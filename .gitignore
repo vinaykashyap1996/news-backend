@@ -5,6 +5,10 @@ node_modules
 /config/plausible_politics.csv
 /config/nottheonion_politics.csv
 /config/satire_politics.csv
+/config/nottheonion.csv
+/config/fake-news.csv
+/config/satire_politics_v1.csv
+/config/true_plausible_1.csv
 .env
 uploads
 satire_politics

@@ -110,7 +110,7 @@ exports.getSessionData = (req, res) => {
       },
       function(userResult, waterfallCb) {
         const selection = {
-          $and: [
+          $or: [
             { category: userResult.category },
             { lang: userResult.language }
           ]
@@ -144,7 +144,7 @@ exports.getSessionData = (req, res) => {
                       }
                       innerWaterfallCb(null, resultsid, Ids);
                     })
-                    .select("newsId flag -_id");
+                    .select("newsId flag articleNo -_id");
                 }
               ],
               function(err, resultsid) {
@@ -168,7 +168,12 @@ exports.getSessionData = (req, res) => {
       if (err) {
         return res.json({ message: err });
       }
-      res.json({ message: "results", newsIds: resultsid, sessionData: Ids });
+      res.json({
+        message: "results",
+        newsIds: resultsid,
+        sessionData: Ids,
+        Total: resultsid.length
+      });
     }
   );
 };

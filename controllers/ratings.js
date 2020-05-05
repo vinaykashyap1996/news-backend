@@ -14,6 +14,8 @@ exports.postratings = (req, res) => {
           belivibalityIndex: req.body.bi,
           priorknowledge: req.body.pk,
           readingTime: req.body.readingTime,
+          articleNo: req.body.articleNo,
+          comment: req.body.comment,
           flag: req.body.flag
         });
         ratingsData.save((err, result) => {

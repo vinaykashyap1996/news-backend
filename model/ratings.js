@@ -6,6 +6,8 @@ const ratingSchema = mongoose.Schema({
   belivibalityIndex: Number,
   priorknowledge: Number,
   readingTime: String,
+  articleNo: Number,
+  comment: String,
   flag: { type: Boolean, default: false }
 });
 
